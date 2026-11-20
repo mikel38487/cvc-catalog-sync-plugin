@@ -36,7 +36,10 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          # Node 24 ставит npm 11, а обмен OIDC-токена (Trusted Publishing)
+          # появился в npm 11.5.1 — на Node 22 с npm 10 будет ENEEDAUTH.
+          node-version: 24
+          registry-url: https://registry.npmjs.org
           cache: npm
       # Версия из тега/релиза обязана совпадать с package.json, иначе 2.0.0
       # может уехать под чужим тегом. Ручной прогон проверяет только формат.
