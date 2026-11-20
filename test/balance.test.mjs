@@ -548,3 +548,17 @@ test('состояние функции привязано к набору deps:
   const second = makeDeps({ routes: [] })
   assert.equal(stateFor(second.deps).last, null, 'новый набор deps не видит чужого снимка')
 })
+test('схема инструмента cvc_balance проходит проверку DSH: только одиночные типы', () => {
+  // DSH отвергает `type: ['number','null']` при регистрации инструмента и
+  // оставляет функцию неактивной. Отсутствующее значение — просто отсутствующий
+  // ключ, а не null, поэтому массивы типов в схеме не нужны.
+  const { deps } = makeDeps({})
+  const spec = tool(deps)
+  const walk = (node, path) => {
+    if (node === null || typeof node !== 'object') return
+    if (Array.isArray(node.type)) assert.fail(`type-массив в схеме: ${path}`)
+    for (const [key, child] of Object.entries(node)) walk(child, `${path}.${key}`)
+  }
+  walk(spec.output?.schema ?? {}, 'output.schema')
+  assert.ok(spec.name.length > 0)
+})
