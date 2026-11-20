@@ -60,7 +60,7 @@
   "devDependencies": {
     "@deepseek-ai/schemastery": ">=3.18.4 <4",
     "tsdown": "^0.23.0",
-    "typescript": "^5.7.2"
+    "typescript": "^7.0.2"
   },
   "publishConfig": {
     "access": "public"
