@@ -472,8 +472,13 @@ test('инструмент: имя есть в реестре при включ�
   const on = boot()
   // Набор инструментов проверяют функции, файл проверяет только гейтинг.
   assert.equal(on.tools.names.includes('cvc_catalog'), true)
+  assert.equal(on.tools.names.includes('cvc_balance'), true)
   const off = boot({ raw: { features: { catalogSync: false } } })
   assert.equal(off.tools.names.includes('cvc_catalog'), false)
+  // Баланс выключен с самого начала: его инструмент не должен даже мелькнуть.
+  const noBalance = boot({ raw: { features: { balance: false } } })
+  assert.equal(noBalance.tools.names.includes('cvc_balance'), false)
+  assert.equal(noBalance.tools.names.includes('cvc_catalog'), true)
 })
 
 test('createStateStore хранит прогон, ошибку и отмечает running', () => {

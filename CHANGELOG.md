@@ -30,6 +30,27 @@ still reachable for anyone reading old profiles.
 
 See [docs/UPGRADING.md](docs/UPGRADING.md) for the steps.
 
+### Fixed in 2.0.1
+
+Version 2.0.0 is the first combined release; 2.0.1 carries the fixes found while
+running it on a live DSH host. Nothing in the configuration surface changed, so
+updating from 2.0.0 is a version bump only.
+
+- **The `cvc_balance` tool declared nullable fields as type unions**
+  (`type: ["number", "null"]`). DSH refuses type arrays when a tool is registered,
+  and the refusal turned the whole plugin row inactive on a live host ("1 entry
+  did not activate"). Missing readings are absent keys, so single types are used
+  now, and a test keeps type arrays out of the schema.
+- **The plugin with every switch off left its tool behind.** With only the
+  balance function enabled, disabling it kept `cvc_balance` registered, because
+  the tool list was built once at activation. Deactivation now removes the tool
+  through the same coordinator that mounts it.
+- **A change to a normal setting remounted all three functions** instead of only
+  the one whose section changed; timers and tools were recreated needlessly.
+- **`publish.yml`** ran on Node 22, whose npm 10 cannot exchange the Trusted
+  Publishing OIDC token (the run failed with `ENEEDAUTH`), and its verification
+  step treated the registry's asynchronous processing as a failure. Release
+  publishing now runs on Node 24 and polls the registry before judging.
 ### Added
 
 - Three function switches — `features.catalogSync`, `features.coefficients`,
