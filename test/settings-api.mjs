@@ -11,7 +11,6 @@ import test from 'node:test'
 const { installSettingsApi, validateConfigInput, normalizeConfig } = await import(new URL('../index.js', import.meta.url).href)
 
 const SELF = 'cvc-catalog-sync'
-const BASE = 'http://localhost'
 
 /** Поддельная строка профиля и соседняя строка с маршрутами. */
 function makeCtx(overrides = {}) {

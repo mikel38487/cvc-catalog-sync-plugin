@@ -116,6 +116,22 @@ function messageOf(error) {
   return error instanceof Error ? error.message : String(error)
 }
 
+/** Снять хвостовые слэши без регулярки: значение приходит из конфигурации. */
+function stripTrailingSlashes(value) {
+  let end = value.length
+  while (end > 0 && value[end - 1] === '/') end -= 1
+  return value.slice(0, end)
+}
+
+/** Снять слэши с обоих концов строки без регулярки. */
+function trimSlashes(value) {
+  let start = 0
+  let end = value.length
+  while (start < end && value[start] === '/') start += 1
+  while (end > start && value[end - 1] === '/') end -= 1
+  return value.slice(start, end)
+}
+
 /** Пустой ли дифф. */
 function isDiffEmpty(diff) {
   return diff.added.length === 0 && diff.removed.length === 0 && diff.changedCount === 0
@@ -201,12 +217,18 @@ function parseCatalogPayload(body) {
  */
 function parseReasoningLevels(text) {
   if (typeof text !== 'string' || text.length === 0) return null
-  const match = /const\s+reasoningLevels\s*=\s*(\{[\s\S]*?\})\s*;/.exec(text)
-  if (match === null) return null
+  // Линейный разбор без регулярки: текст приходит из сети, а нежадный
+  // `[\s\S]*?` на большом файле — кандидат на квадратичный откат.
+  const start = text.indexOf('const reasoningLevels')
+  if (start < 0) return null
+  const open = text.indexOf('{', start)
+  if (open < 0) return null
+  const close = text.indexOf('};', open)
+  if (close < 0) return null
   /** @type {unknown} */
   let parsed
   try {
-    parsed = JSON.parse(match[1])
+    parsed = JSON.parse(text.slice(open, close + 1))
   } catch {
     return null
   }
@@ -686,9 +708,7 @@ function installSettingsApi(webServer, deps) {
       }
       let route
       try {
-        route = new URL(req.url ?? '/', 'http://localhost').pathname
-          .slice(SETTINGS_API_PREFIX.length)
-          .replace(/^\/+|\/+$/g, '')
+        route = trimSlashes(new URL(req.url ?? '/', 'http://localhost').pathname.slice(SETTINGS_API_PREFIX.length))
       } catch {
         sendJson(res, 400, { error: 'malformed url' })
         return
@@ -834,7 +854,7 @@ export function apply(ctx, config = {}) {
    * @returns {Promise<Array<Record<string, unknown>>>}
    */
   async function fetchCatalog(key, signal) {
-    const url = `${cfg.baseURL.replace(/\/+$/, '')}/models`
+    const url = `${stripTrailingSlashes(cfg.baseURL)}/models`
     const response = await fetch(url, {
       headers: { authorization: `Bearer ${key}`, accept: 'application/json' },
       signal: fetchSignal(signal, cfg.timeoutMs),

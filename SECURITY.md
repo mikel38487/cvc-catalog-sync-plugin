@@ -50,6 +50,22 @@ models the catalog describes — report those to their maintainers.
 - npm releases with provenance through npm Trusted Publishing from GitHub
   Actions.
 
+## Accepted findings
+
+OpenSSF Scorecard reports posture items that a single-maintainer plugin cannot
+satisfy by design; they are accepted, not ignored:
+
+| Check | Why it stays |
+| --- | --- |
+| Code-Review | one maintainer; there is no second reviewer |
+| Branch-Protection | `main` blocks deletion and force-push; required reviews or status checks would lock out direct maintenance |
+| Maintained | young repository |
+| CII-Best-Practices | no OpenSSF badge application yet |
+| Fuzzing | no fuzz target; robustness is covered by edge-case tests |
+
+Everything actionable is enabled: Dependabot, CodeQL, secret scanning with push
+protection, pinned actions, and provenance on npm releases.
+
 ---
 
 # Политика безопасности
