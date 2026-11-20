@@ -1,0 +1,14 @@
+# Хост-половина синхронизации каталога CheapVibeCode.
+#
+# Плагин ничего не показывает в интерфейсе: он забирает GET /v1/models,
+# вытаскивает карту уровней мышления из установщика /idhw и точечно пишет
+# models в строку llm-pi-ai профильного патча. Ручной запуск — инструмент
+# cvc_catalog. Своей строкой конфига настраивается поведение (см. README).
+
+- insert:
+    - id: cvc-catalog-sync
+      name: 'cvc-catalog-sync-plugin'
+      config:
+        provider: cheapvibecode
+        autoSync: true
+        intervalHours: 24

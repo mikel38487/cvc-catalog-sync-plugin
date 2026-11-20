@@ -1,0 +1,40 @@
+name: Publish
+
+# Trusted Publishing: configure this repository, workflow `publish.yml` and
+# environment `npm` as the trusted publisher for the npm package first
+# (npmjs.com → package → Settings → Trusted publishers). No long-lived token
+# is used; provenance is attached to the published tarball.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: npm publish
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Tests before publish
+        run: npm test
+      - name: Publish with provenance
+        run: |
+          set -euo pipefail
+          name="$(node --print "require('./package.json').name")"
+          version="$(node --print "require('./package.json').version")"
+          if npm view "${name}@${version}" version >/dev/null 2>&1; then
+            echo "${name}@${version} is already published; nothing to do"
+            exit 0
+          fi
+          npm publish --access public --provenance

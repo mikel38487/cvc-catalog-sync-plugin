@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "CVC catalog sync",
+    "description": "Keeps the CheapVibeCode route's model list in the profile patch in sync with /v1/models and with the reasoning levels published by the official installer. Runs at startup and on a timer, writes only when the catalog or the subagent allowlist changed, adds the cvc_catalog tool, and puts every setting on the plugin's own page in Plugins and on a Settings → CVC catalog page, both with check and apply actions."
+  }
+}
