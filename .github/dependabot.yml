@@ -1,3 +1,8 @@
+# npm-обновления касаются только devDependencies (tsdown, typescript,
+# @deepseek-ai/schemastery): единственная рантайм-зависимость — peer
+# schemastery, её разрешает каталог установки DSH. Обновление dev-пакета
+# приходит вместе с новым package-lock.json, и CI сразу проверяет, что
+# собранный client.js от него не поменялся.
 version: 2
 
 updates:

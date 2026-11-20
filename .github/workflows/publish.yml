@@ -1,9 +1,14 @@
 name: Publish
 
-# Trusted Publishing: configure this repository, workflow `publish.yml` and
-# environment `npm` as the trusted publisher for the npm package first
-# (npmjs.com → package → Settings → Trusted publishers). No long-lived token
-# is used; provenance is attached to the published tarball.
+# Trusted Publishing: в настройках npm-пакета репозиторий
+# mikel38487/cvc-catalog-sync-plugin, workflow `publish.yml` и окружение `npm`
+# указаны как trusted publisher. Долгоживущего токена нет: права выдаёт OIDC
+# (id-token: write), а к тарболу прикладывается provenance.
+#
+# Триггеры:
+#   release: published — основной путь. Тег создаётся вместе с релизом,
+#                        тег обязан совпадать с version из package.json;
+#   workflow_dispatch  — ручной прогон; публикует версию из package.json.
 
 on:
   release:
@@ -12,27 +17,66 @@ on:
 
 permissions:
   contents: read
-  id-token: write
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   publish:
     name: npm publish
     runs-on: ubuntu-latest
     environment: npm
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
-      - name: Tests before publish
+          node-version: 22
+          cache: npm
+      # Версия из тега/релиза обязана совпадать с package.json, иначе 2.0.0
+      # может уехать под чужим тегом. Ручной прогон проверяет только формат.
+      - name: Version matches the release tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          version="$(node -e "process.stdout.write(require('./package.json').version)")"
+          echo "package.json version: ${version}"
+          if [ "${EVENT_NAME}" != "release" ]; then
+            echo "event ${EVENT_NAME}: tag check skipped (manual run publishes ${version})"
+            exit 0
+          fi
+          tag="${RELEASE_TAG}"
+          echo "release tag: ${tag:-<empty>}"
+          if [ -z "${tag}" ]; then
+            echo "::error::release tag is empty"
+            exit 1
+          fi
+          if [ "${tag#v}" != "${version}" ]; then
+            echo "::error::tag ${tag} does not match package.json version ${version}"
+            exit 1
+          fi
+      - name: Install
+        run: npm ci
+      - name: Tests
         run: npm test
+      - name: Build client
+        run: npm run build
+      - name: Built client.js matches the committed one
+        run: git diff --exit-code -- client.js
+      - name: Package contents
+        run: node tools/assert-pack.mjs
       - name: Publish with provenance
         run: |
           set -euo pipefail
-          name="$(node --print "require('./package.json').name")"
-          version="$(node --print "require('./package.json').version")"
+          name="$(node -e "process.stdout.write(require('./package.json').name)")"
+          version="$(node -e "process.stdout.write(require('./package.json').version)")"
           if npm view "${name}@${version}" version >/dev/null 2>&1; then
             echo "${name}@${version} is already published; nothing to do"
             exit 0

@@ -1,6 +1,7 @@
 {
   "meta": {
-    "title": "CVC catalog sync",
-    "description": "Keeps the CheapVibeCode route's model list in the profile patch in sync with /v1/models and with the reasoning levels published by the official installer. Runs at startup and on a timer, writes only when the catalog or the subagent allowlist changed, adds the cvc_catalog tool, and puts every setting on the plugin's own page in Plugins and on a Settings → CVC catalog page, both with check and apply actions."
+    "title": "CVC catalog, coefficients and balance",
+    "description": "Three switchable features for a CheapVibeCode route: keeps the model catalog and reasoning levels in the profile patch in sync with /v1/models, shows the price multiplier beside each model in the picker, and puts the remaining balance in a sidebar panel.\n\nThe settings page lives in Settings -> CVC and on the bundle page in Plugins -> CVC catalog sync. It has one switch per feature, a field group for its parameters, and Check catalog / Apply catalog buttons that show the diff and then write it; the first run needs the route's API key, which the host resolves by name and never sends to the browser. Everything the plugin reads goes to the CheapVibeCode hosts from the route's own baseURL and installer URLs: no telemetry, no other destination. A switched-off feature registers no route, timer, tool or UI element.",
+    "detail": "docs/DETAIL.md"
   }
 }

@@ -1,5 +1,10 @@
 name: Scorecard
 
+# OSSF Scorecard: оценка гигиены репозитория (ветвление, зависимости, CI,
+# подписанные релизы). publish.yml публикует с provenance, поэтому прогон
+# Scorecard полезен как проверка, что публикация действительно подписана.
+# Результаты в SARIF уходят в code scanning и в публичный API Scorecard
+# (publish_results).
 on:
   branch_protection_rule:
   schedule:

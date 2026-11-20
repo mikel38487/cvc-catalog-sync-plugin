@@ -1,16 +1,16 @@
 {
   "name": "cvc-catalog-sync-plugin",
-  "version": "1.0.0",
-  "description": "DSH plugin: keeps the CheapVibeCode model catalog in the profile patch in sync with /v1/models and the reasoning levels from the official installer, with a settings page in the DSH UI",
+  "version": "2.0.0",
+  "description": "DSH plugin for CheapVibeCode with three switchable features: keeps the model catalog and reasoning levels in the profile patch in sync with /v1/models, shows model coefficients next to the model picker and the account balance in the sidebar",
   "type": "module",
   "keywords": [
     "dsh",
-    "deepseek-harness",
-    "cordis",
     "dsh-plugin",
     "cheapvibecode",
     "model-catalog",
-    "reasoning-levels"
+    "reasoning-levels",
+    "balance",
+    "model-coefficients"
   ],
   "author": "mikel38487",
   "license": "MIT",
@@ -26,23 +26,42 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/self-test.mjs test/integration.mjs test/settings-api.mjs test/client-render.mjs"
+    "test": "node --test test/*.mjs",
+    "build": "node tools/build-client.mjs"
   },
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
     "./locale/*.json": "./locale/*.json",
-    "./icon": "./icon.svg"
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
   },
   "files": [
     "index.js",
     "client.js",
+    "lib/",
     "cordis.patch.yml",
     "locale/*.json",
+    "docs",
     "icon.svg",
     "README.md",
-    "SECURITY.md"
+    "README.ru.md",
+    "SECURITY.md",
+    "CHANGELOG.md"
   ],
+  "peerDependencies": {
+    "@deepseek-ai/schemastery": ">=3.18.4 <4"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/schemastery": ">=3.18.4 <4",
+    "tsdown": "^0.23.0",
+    "typescript": "^5.7.2"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -53,8 +72,11 @@
     "client": {
       "platform": "web",
       "inject": [
-        "@deepseek-ai/dsh-client-ui-settings"
-      ]
+        "@deepseek-ai/dsh-client-ui-model-selection",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ],
+      "external": []
     },
     "engines": {
       "dsh": ">=0.2.2-rc.3 <0.4.0"

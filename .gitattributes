@@ -1,5 +1,24 @@
+# В репозитории и в рабочем дереве — только LF. client.js собирается и на
+# Windows, и на Linux: CRLF в артефакте дал бы ложный diff в CI
+# (`git diff --exit-code client.js`) и расхождение тарбола с коммитом.
 * text=auto eol=lf
-*.svg text
+
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.svg text eol=lf
+
 *.png binary
 *.jpg binary
 *.webp binary
+*.gif binary
+*.ico binary
+*.tgz binary
+
+# Собрано tools/build-client.mjs — в отчётах GitHub не разворачивать.
+client.js linguist-generated=true
+package-lock.json linguist-generated=true -diff
