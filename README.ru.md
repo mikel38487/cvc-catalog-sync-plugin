@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/mikel38487/cvc-catalog-sync-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/mikel38487/cvc-catalog-sync-plugin/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/mikel38487/cvc-catalog-sync-plugin/actions/workflows/codeql.yml/badge.svg)](https://github.com/mikel38487/cvc-catalog-sync-plugin/actions/workflows/codeql.yml)
+[![downloads](https://img.shields.io/npm/dm/cvc-catalog-sync-plugin)](https://www.npmjs.com/package/cvc-catalog-sync-plugin)
 [![npm](https://img.shields.io/npm/v/cvc-catalog-sync-plugin.svg)](https://www.npmjs.com/package/cvc-catalog-sync-plugin)
+[![GitHub stars](https://img.shields.io/github/stars/mikel38487/cvc-catalog-sync-plugin?style=flat&label=stars)](https://github.com/mikel38487/cvc-catalog-sync-plugin/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Один плагин для трёх вещей, которые нужны профилю DSH с маршрутом
