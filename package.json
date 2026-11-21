@@ -1,6 +1,6 @@
 {
   "name": "cvc-catalog-sync-plugin",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "DSH plugin for CheapVibeCode with three switchable features: keeps the model catalog and reasoning levels in the profile patch in sync with /v1/models, shows model coefficients next to the model picker and the account balance in the sidebar",
   "type": "module",
   "keywords": [

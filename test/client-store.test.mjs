@@ -480,6 +480,11 @@ test('indexPayload терпит пустой ответ', () => {
 test('formatMultiplier печатает ×N и не врёт на дробях', () => {
   assert.equal(formatMultiplier(1), '×1')
   assert.equal(formatMultiplier(0.1), '×0.1')
+  // Хост и клиент обязаны печатать одинаково, иначе подсказка и бейдж расходятся.
+  assert.equal(formatMultiplier(0.001), '×0.001')
+  assert.equal(formatMultiplier(0.0005), '×~0.001')
+  assert.equal(formatMultiplier(0.125), '×0.125')
+  assert.equal(formatMultiplier(1e-7), '×~0')
   assert.equal(formatMultiplier(2.5), '×2.5')
   assert.equal(formatMultiplier(10.0), '×10')
   assert.equal(formatMultiplier(Number.NaN), '')

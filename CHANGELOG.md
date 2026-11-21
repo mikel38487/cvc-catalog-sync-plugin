@@ -13,7 +13,17 @@ under one prefix.
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **A multiplier of `0.001` was shown as `×0`.** The browser badge rounded to two
+  decimals, while the host hint and the route printed four, so the two disagreeing
+  formats never met in one place. Five models of the live CheapVibeCode catalog
+  (`hy4flash`, `glm-5.3-flash`, `nemotron-3-ultra`, `nemotron-3.5-lightning`,
+  `nemotron-3.5-super-vl`) carry that multiplier, and `×0` read as "free".
+  A multiplier now shows up to three decimals exactly (`×0.001`, `×0.125`); a finer
+  value is shown rounded with a tilde (`0.0005` → `×~0.001`), never as `×0`. Host
+  and browser share the rule, and exponent notation is never printed.
+
 
 ## [2.0.0] - 2026-11-21
 

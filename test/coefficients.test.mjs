@@ -252,6 +252,20 @@ test('бейдж не тащит хвостовые нули и не врёт п
   assert.equal(formatMultiplier(2.5), '×2.5')
   assert.equal(formatMultiplier(2.5), formatMultiplier(Number('2.50')))
   assert.equal(formatMultiplier(0), '×0')
+  // Реальный каталог CheapVibeCode (21.11.2026): у пяти моделей множитель
+  // 0.001, и «×0» в бейдже был бы ложью — модель не бесплатная.
+  assert.equal(formatMultiplier(0.001), '×0.001')
+  assert.equal(formatMultiplier(0.00101), '×~0.001')
+  assert.equal(formatMultiplier(0.0005), '×~0.001')
+  assert.equal(formatMultiplier(0.0004), '×~0')
+  assert.equal(formatMultiplier(0.125), '×0.125')
+  assert.equal(formatMultiplier(1.005), '×1.005')
+  assert.equal(formatMultiplier(1e-7), '×~0')
+  assert.equal(formatMultiplier(10), '×10')
+  // Правило не должно печатать экспоненту никогда.
+  for (const value of [1e-7, 1e21, 1e-3, 1234567.891]) {
+    assert.equal(/\d[eE]/.test(formatMultiplier(value)), false, formatMultiplier(value))
+  }
   assert.equal(formatMultiplier(Number.NaN), '')
 })
 

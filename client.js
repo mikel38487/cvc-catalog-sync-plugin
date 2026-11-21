@@ -1674,16 +1674,44 @@ window.__ModuleLoader__.load({
     		providers: Array.isArray(payload?.providers) ? payload.providers.filter((id) => typeof id === "string" && id.length > 0) : []
     	};
     }
+    /** Сколько знаков после запятой показывается полностью. */
+    const SHOWN_DECIMALS = 3;
     /**
-    * Отформатировать множитель: `×1`, `×0.1`, `×2.5`.
+    * Значение огрублённое до `SHOWN_DECIMALS` знаков.
+    *
+    * Экспоненциальную запись (`1e-7`) раскладываем в обычную десятичную:
+    * бейдж должен читаться как число, а не как степень.
+    * @param {number} value
+    * @returns {string} например `0.001`, `2.5`, `10`.
+    */
+    function plainNumber(value) {
+    	const rounded = Number(value.toFixed(SHOWN_DECIMALS));
+    	const text = String(rounded);
+    	if (!/e/i.test(text)) return text;
+    	const [mantissa, exponent] = text.split(/e/i);
+    	const power = Number(exponent);
+    	const digits = mantissa.replace("-", "").replace(".", "");
+    	const sign = mantissa.startsWith("-") ? "-" : "";
+    	if (power >= 0) return `${sign}${digits}${"0".repeat(power)}`;
+    	return `${sign}0.${"0".repeat(Math.abs(power) - 1)}${digits}`;
+    }
+    /**
+    * Подпись множителя для бейджа и подсказки.
+    *
+    * До трёх знаков после запятой — точное значение: `×1`, `×0.1`, `×0.001`.
+    * Если значение точнее, оно не округляется в «похожее» число, а показывается
+    * огрублённым с тильдой: `0.125` → `×~0.125`, `0.0005` → `×~0.001` (иначе
+    * `×0` врал бы: модель не бесплатная).
     *
     * @param {number} value - множитель.
-    * @returns {string} подпись бейджа.
+    * @returns {string} подпись бейджа; пустая строка для нечисла.
     */
     function formatMultiplier(value) {
     	if (!Number.isFinite(value)) return "";
-    	const rounded = Math.round(value * 100) / 100;
-    	return `×${Number.isInteger(rounded) ? String(rounded) : String(rounded)}`;
+    	const exact = Number(value.toFixed(10));
+    	const rounded = Number(value.toFixed(SHOWN_DECIMALS));
+    	const shown = plainNumber(rounded);
+    	return `×${Math.abs(exact - rounded) > 1e-9 ? "~" : ""}${shown}`;
     }
     /** Класс цены по тем же порогам, что и заметка в Obsidian. */
     function tierOf(multiplier) {
@@ -1700,8 +1728,8 @@ window.__ModuleLoader__.load({
     * @returns {string} текст `title`.
     */
     function badgeHint(entry, showFast) {
-    	const lines = [`×${entry.multiplier}`];
-    	if (showFast === true && entry.fastMultiplier !== null) lines.push(`fast ×${entry.fastMultiplier}`);
+    	const lines = [formatMultiplier(entry.multiplier)];
+    	if (showFast === true && entry.fastMultiplier !== null) lines.push(`fast ${formatMultiplier(entry.fastMultiplier)}`);
     	return lines.join(" · ");
     }
     /**
